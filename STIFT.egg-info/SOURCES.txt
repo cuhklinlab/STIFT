@@ -1,0 +1,17 @@
+README
+setup.py
+STIFT/DESTOT.py
+STIFT/STALIGNER.py
+STIFT/STIFT.py
+STIFT/__init__.py
+STIFT/destot_opt.py
+STIFT/gat_conv.py
+STIFT/metric.py
+STIFT/train_STIFT.py
+STIFT/visualization.py
+STIFT.egg-info/PKG-INFO
+STIFT.egg-info/SOURCES.txt
+STIFT.egg-info/dependency_links.txt
+STIFT.egg-info/not-zip-safe
+STIFT.egg-info/requires.txt
+STIFT.egg-info/top_level.txt

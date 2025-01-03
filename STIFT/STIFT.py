@@ -16,9 +16,8 @@ import scipy
 import anndata as ad
 import scipy.linalg
 
-import STAligner
-from STIFT.train_STIFT import train_STIFT
-from destot.DESTOT import align
+from .train_STIFT import train_STIFT
+from .DESTOT import align
 
 def get_mapping(Pi):
     mapping_AB = np.argmax(Pi, axis=1)
@@ -209,55 +208,58 @@ def create_ST2_adj_matrix(adata_list, section_ids):
     adj_concat : np.ndarray
         The final adjacency matrix incorporating both spatial and temporal relationships.
     """
-    # Concatenate AnnData objects
     adata_concat = ad.concat(adata_list)
-    print('adata_concat.shape: ', adata_concat.shape)
-
-    adj_concat = adata_list[0].uns['adj']
+    
+    # Initialize in LIL format
+    adj_concat = adata_list[0].uns['adj'].tolil()
+    
+    # Create block diagonal matrix
     for batch_id in range(1, len(section_ids)):
         adj_concat = sp.block_diag((adj_concat, adata_list[batch_id].uns['adj']))
+    adj_concat = adj_concat.tolil()  # Ensure LIL format
+    
     batch_index = adata_concat.obs["batch_names"]
-
-    # Update adjacency matrix with temporal relationships
+    
+    # Process temporal relationships
     for i in range(len(section_ids) - 1):
         if "parents" in adata_list[i].obsm:
             prev_section_size = adata_list[i-1].shape[0] if i > 0 else 0
             current_section_size = adata_list[i].shape[0]
             adj_parents = np.zeros((prev_section_size, current_section_size))
-
+            
             for j in range(current_section_size):
                 parent_index = adata_list[i].obsm["parents"][j]
                 if parent_index is not None:
                     adj_parents[parent_index, j] = 1
-
+                    
             mask_i_1 = batch_index == section_ids[i-1]
             mask_i = batch_index == section_ids[i]
-
+            
             current_submatrix = adj_concat[np.ix_(mask_i_1, mask_i)]
-            adj_concat[np.ix_(mask_i_1, mask_i)] = np.where(current_submatrix == 0, adj_parents, 1)
-
+            adj_concat[np.ix_(mask_i_1, mask_i)] = np.where(current_submatrix.toarray() == 0, adj_parents, 1)
             current_submatrix = adj_concat[np.ix_(mask_i, mask_i_1)]
-            adj_concat[np.ix_(mask_i, mask_i_1)] = np.where(current_submatrix == 0, adj_parents.T, 1)
+            adj_concat[np.ix_(mask_i, mask_i_1)] = np.where(current_submatrix.toarray() == 0, adj_parents.T, 1)
         
         if "children" in adata_list[i].obsm:
             current_section_size = adata_list[i].shape[0]
             next_section_size = adata_list[i+1].shape[0] if i + 1 < len(adata_list) else 0
             adj_children = np.zeros((current_section_size, next_section_size))
-
+            
             for j in range(current_section_size):
                 child_index = adata_list[i].obsm["children"][j]
                 if child_index is not None:
                     adj_children[j, child_index] = 1
-
+                    
             mask_i = batch_index == section_ids[i]
             mask_i_1 = batch_index == section_ids[i+1]
-
+            
             adj_concat[np.ix_(mask_i, mask_i_1)] = adj_children
             adj_concat[np.ix_(mask_i_1, mask_i)] = adj_children.T
-
-    # Store edge list in the concatenated AnnData object
+    
+    # Convert to COO format at the end
+    adj_concat = adj_concat.tocoo()
     adata_concat.uns['edgeList'] = np.nonzero(adj_concat)
-
+    
     return adata_concat, adj_concat
 
 def STIFT(adata_list, section_ids, pre_n_epochs=500, n_epochs=2000, knn_cutoff=12, used_device='cuda:0'):

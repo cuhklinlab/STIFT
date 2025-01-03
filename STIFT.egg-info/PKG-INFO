@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: STIFT
+Version: 1.0.0
+Summary: STIFT: Spatiotemporal Integration Framework for Transcriptomics
+Home-page: https://github.com/TheLittleJimmy/STIFT
+Author: Ji Qi
+Author-email: qiji@link.cuhk.edu.hk
+License: MIT
+Requires-Dist: anndata==0.10.8
+Requires-Dist: matplotlib==3.9.0
+Requires-Dist: numpy==1.26.0
+Requires-Dist: pandas==2.2.2
+Requires-Dist: requests
+Requires-Dist: scanpy==1.10.3
+Requires-Dist: scikit-learn==1.5.1
+Requires-Dist: scipy==1.12.0
+Requires-Dist: torch==2.3.0+cu121
+Requires-Dist: networkx==3.1
+Requires-Dist: POT==0.9.4

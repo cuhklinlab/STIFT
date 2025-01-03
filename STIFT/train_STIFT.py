@@ -3,7 +3,7 @@ import pandas as pd
 from tqdm import tqdm
 import scipy.sparse as sp
 
-from STALIGNER import STAligner
+from .STALIGNER import STAligner
 
 import torch
 import torch.backends.cudnn as cudnn
@@ -97,33 +97,6 @@ def train_STIFT(adata_list=None, adata_concat=None, hidden_dims=[512, 30], pre_n
     adata_concat.obsm[key_added] = z.cpu().detach().numpy()
     return adata_concat
 
-# def create_family_dicts(adata_list, section_ids):
-#     family_dict = {}
-
-#     for i in range(len(adata_list) - 1):
-#         batch_pair = f"{section_ids[i]}_{section_ids[i+1]}"
-#         family_dict[batch_pair] = {}
-
-#         # Process children
-#         children = adata_list[i].obsm["children"]
-#         for cell_idx, child_indices in enumerate(children):
-#             valid_children = [idx for idx in child_indices if idx != -1]  # Assuming -1 represents no child
-#             if valid_children:
-#                 cell_name = adata_list[i].obs_names[cell_idx]
-#                 child_names = adata_list[i+1].obs_names[valid_children].tolist()
-#                 family_dict[batch_pair][cell_name] = child_names
-
-#         # Process parents
-#         parents = adata_list[i+1].obsm["parents"]
-#         for cell_idx, parent_indices in enumerate(parents):
-#             valid_parents = [idx for idx in parent_indices if idx != -1]  # Assuming -1 represents no parent
-#             if valid_parents:
-#                 cell_name = adata_list[i+1].obs_names[cell_idx]
-#                 parent_names = adata_list[i].obs_names[valid_parents].tolist()
-#                 family_dict[batch_pair][cell_name] = parent_names
-
-#     return family_dict
-
 def create_family_dicts(adata_list, section_ids):
     family_dict = {}
 
@@ -176,21 +149,6 @@ def create_triplets(adata_concat, family_dict, section_ids):
                 cellname_by_batch_dict[anchor_batch][np.random.randint(section_size)]
             )
             
-        # for anchor in family_dict[batch_pair].keys():
-            
-        #     anchor_list.append(anchor)
-            
-        #     # Select the first child/parent as positive
-        #     positive_spot = family_dict[batch_pair][anchor][0]
-        #     positive_list.append(positive_spot)
-
-        #     # Select a random cell from the same batch as the anchor for negative
-        #     anchor_batch = adata_concat.obs.loc[anchor, 'batch_names']
-        #     section_size = len(cellname_by_batch_dict[anchor_batch])
-        #     negative_list.append(
-        #         cellname_by_batch_dict[anchor_batch][np.random.randint(section_size)]
-        #     )
-
         # Convert cell names to indices
         batch_as_dict = dict(zip(list(adata_concat.obs_names), range(0, adata_concat.shape[0])))
         anchor_ind = np.append(anchor_ind, list(map(lambda _: batch_as_dict[_], anchor_list)))
