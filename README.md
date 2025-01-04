@@ -12,7 +12,7 @@ Overview of STIFT. STIFT first uses developmental spatiotemporal optimal transpo
 
 ```
 git clone https://github.com/TheLittleJimmy/STIFT.git
-cd STIFT-main
+cd STIFT
 ```
 
 ### Create new environment
