@@ -39,7 +39,7 @@ pip install .
 
 ## Tutorial
 
-[Tutorial](https://github.com/TheLittleJimmy/STIFT/blob/main/tutorial/tutorial_ARTISTA_integration.ipynb) provides the basic workflow of STIFT. For more information, please visit [STIFT archive repository](https://github.com/TheLittleJimmy/temporal_alignment). 
+[Tutorial](https://github.com/TheLittleJimmy/STIFT/blob/main/tutorial/tutorial_ARTISTA_integration.ipynb) provides the basic workflow of STIFT.
 
 ## Contact
 
